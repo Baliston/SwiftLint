@@ -80,15 +80,13 @@ opt_in_rules:
 identifier_name:
   excluded:
     - id
+large_tuple: 3
 number_separator:
   minimum_length: 5
 file_name:
   excluded:
-    - main.swift
-    - LinuxMain.swift
+    - GeneratedTests.swift
     - TestHelpers.swift
-    - shim.swift
-    - AutomaticRuleTests.generated.swift
 
 custom_rules:
   rule_id:

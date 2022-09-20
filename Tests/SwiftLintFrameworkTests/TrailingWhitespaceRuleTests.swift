@@ -1,11 +1,7 @@
 import SwiftLintFramework
 import XCTest
 
-class TrailingWhitespaceTests: XCTestCase {
-    func testWithDefaultConfiguration() {
-        verifyRule(TrailingWhitespaceRule.description)
-    }
-
+class TrailingWhitespaceRuleTests: XCTestCase {
     func testWithIgnoresEmptyLinesEnabled() {
         // Perform additional tests with the ignores_empty_lines setting enabled.
         // The set of non-triggering examples is extended by a whitespace-indented empty line

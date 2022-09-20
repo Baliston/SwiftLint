@@ -2,12 +2,6 @@ import SwiftLintFramework
 import XCTest
 
 class DeploymentTargetRuleTests: XCTestCase {
-    func testRule() {
-        verifyRule(DeploymentTargetRule.description)
-    }
-
-    // MARK: - Reasons
-
     func testMacOSAttributeReason() {
         let example = Example("@available(macOS 10.11, *)\nclass A {}")
         let violations = self.violations(example, config: ["macOS_deployment_target": "10.14.0"])

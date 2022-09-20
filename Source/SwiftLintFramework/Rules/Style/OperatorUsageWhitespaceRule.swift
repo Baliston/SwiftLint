@@ -2,8 +2,7 @@ import Foundation
 import SourceKittenFramework
 import SwiftSyntax
 
-public struct OperatorUsageWhitespaceRule: OptInRule, CorrectableRule, ConfigurationProviderRule,
-                                           AutomaticTestableRule {
+public struct OperatorUsageWhitespaceRule: OptInRule, CorrectableRule, ConfigurationProviderRule, SourceKitFreeRule {
     public var configuration = OperatorUsageWhitespaceConfiguration()
 
     public init() {}
@@ -27,17 +26,15 @@ public struct OperatorUsageWhitespaceRule: OptInRule, CorrectableRule, Configura
     }
 
     private func violationRanges(file: SwiftLintFile) -> [(ByteRange, String)] {
-        let visitor = OperatorUsageWhitespaceVisitor()
-        return visitor.walk(file: file, handler: \.violationRanges)
-            .filter { byteRange, _ in
-                if configuration.skipAlignedConstants && isAlignedConstant(in: byteRange, file: file) {
-                    return false
-                }
-
-                return true
-            }.sorted { lhs, rhs in
-                lhs.0.location < rhs.0.location
-            }
+        OperatorUsageWhitespaceVisitor(
+            allowedNoSpaceOperators: configuration.allowedNoSpaceOperators
+        )
+        .walk(file: file, handler: \.violationRanges)
+        .filter { byteRange, _ in
+            !configuration.skipAlignedConstants || !isAlignedConstant(in: byteRange, file: file)
+        }.sorted { lhs, rhs in
+            lhs.0.location < rhs.0.location
+        }
     }
 
     public func correct(file: SwiftLintFile) -> [Correction] {
@@ -124,7 +121,12 @@ public struct OperatorUsageWhitespaceRule: OptInRule, CorrectableRule, Configura
 }
 
 private class OperatorUsageWhitespaceVisitor: SyntaxVisitor {
+    private let allowedNoSpaceOperators: Set<String>
     private(set) var violationRanges: [(ByteRange, String)] = []
+
+    init(allowedNoSpaceOperators: [String]) {
+        self.allowedNoSpaceOperators = Set(allowedNoSpaceOperators)
+    }
 
     override func visitPost(_ node: BinaryOperatorExprSyntax) {
         if let violation = violation(operatorToken: node.operatorToken) {
@@ -170,10 +172,8 @@ private class OperatorUsageWhitespaceVisitor: SyntaxVisitor {
         let noSpacingAfter = operatorToken.trailingTrivia.isEmpty && nextToken.leadingTrivia.isEmpty
         let noSpacing = noSpacingBefore || noSpacingAfter
 
-        let allowedNoSpacingOperators: Set = ["...", "..<"]
-
         let operatorText = operatorToken.withoutTrivia().text
-        if noSpacing && allowedNoSpacingOperators.contains(operatorText) {
+        if noSpacing && allowedNoSpaceOperators.contains(operatorText) {
             return nil
         }
 
@@ -195,7 +195,7 @@ private class OperatorUsageWhitespaceVisitor: SyntaxVisitor {
             length: endPosition - location
         )
 
-        let correction = allowedNoSpacingOperators.contains(operatorText) ? operatorText : " \(operatorText) "
+        let correction = allowedNoSpaceOperators.contains(operatorText) ? operatorText : " \(operatorText) "
         return (range, correction)
     }
 }

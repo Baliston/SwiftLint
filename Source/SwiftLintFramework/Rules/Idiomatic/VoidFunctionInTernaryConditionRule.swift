@@ -1,7 +1,6 @@
-import SourceKittenFramework
 import SwiftSyntax
 
-public struct VoidFunctionInTernaryConditionRule: ConfigurationProviderRule, AutomaticTestableRule {
+public struct VoidFunctionInTernaryConditionRule: ConfigurationProviderRule, SwiftSyntaxRule {
     public var configuration = SeverityConfiguration(.warning)
 
     public init() {}
@@ -109,16 +108,13 @@ public struct VoidFunctionInTernaryConditionRule: ConfigurationProviderRule, Aut
         ]
     )
 
-    public func validate(file: SwiftLintFile) -> [StyleViolation] {
-        let visitor = VoidFunctionInTernaryConditionVisitor()
-        return visitor.walk(file: file) { visitor in
-            visitor.violations(for: self, in: file)
-        }
+    public func makeVisitor(file: SwiftLintFile) -> ViolationsSyntaxVisitor? {
+        VoidFunctionInTernaryConditionVisitor()
     }
 }
 
-private class VoidFunctionInTernaryConditionVisitor: SyntaxVisitor {
-    private var positions = [AbsolutePosition]()
+private class VoidFunctionInTernaryConditionVisitor: SyntaxVisitor, ViolationsSyntaxVisitor {
+    private(set) var violationPositions: [AbsolutePosition] = []
 
     override func visitPost(_ node: TernaryExprSyntax) {
         guard node.firstChoice.is(FunctionCallExprSyntax.self),
@@ -132,15 +128,7 @@ private class VoidFunctionInTernaryConditionVisitor: SyntaxVisitor {
             return
         }
 
-        positions.append(node.questionMark.positionAfterSkippingLeadingTrivia)
-    }
-
-    func violations(for rule: VoidFunctionInTernaryConditionRule, in file: SwiftLintFile) -> [StyleViolation] {
-        return positions.map { position in
-            StyleViolation(ruleDescription: type(of: rule).description,
-                           severity: rule.configuration.severity,
-                           location: Location(file: file, byteOffset: ByteCount(position)))
-        }
+        violationPositions.append(node.questionMark.positionAfterSkippingLeadingTrivia)
     }
 }
 

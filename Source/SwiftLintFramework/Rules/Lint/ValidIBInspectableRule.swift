@@ -1,7 +1,7 @@
 import Foundation
 import SourceKittenFramework
 
-public struct ValidIBInspectableRule: ASTRule, ConfigurationProviderRule, AutomaticTestableRule {
+public struct ValidIBInspectableRule: ASTRule, ConfigurationProviderRule {
     public var configuration = SeverityConfiguration(.warning)
 
     private static let supportedTypes = Self.createSupportedTypes()
@@ -93,22 +93,12 @@ public struct ValidIBInspectableRule: ASTRule, ConfigurationProviderRule, Automa
             """),
             Example("""
             class Foo {
-              @IBInspectable private ↓var x: ImplicitlyUnwrappedOptional<Int>
-            }
-            """),
-            Example("""
-            class Foo {
               @IBInspectable private ↓var count: Optional<Int>
             }
             """),
             Example("""
             class Foo {
               @IBInspectable private ↓var x: Optional<String>
-            }
-            """),
-            Example("""
-            class Foo {
-              @IBInspectable private ↓var x: ImplicitlyUnwrappedOptional<String>
             }
             """)
         ]

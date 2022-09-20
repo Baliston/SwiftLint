@@ -1,7 +1,6 @@
-import SourceKittenFramework
 import SwiftSyntax
 
-public struct ForceCastRule: ConfigurationProviderRule, AutomaticTestableRule {
+public struct ForceCastRule: ConfigurationProviderRule, SwiftSyntaxRule {
     public var configuration = SeverityConfiguration(.error)
 
     public init() {}
@@ -17,22 +16,17 @@ public struct ForceCastRule: ConfigurationProviderRule, AutomaticTestableRule {
         triggeringExamples: [ Example("NSNumber() ↓as! Int\n") ]
     )
 
-    public func validate(file: SwiftLintFile) -> [StyleViolation] {
-        let visitor = ForceCastRuleVisitor()
-        return visitor.walk(file: file, handler: \.positions).map { position in
-            StyleViolation(ruleDescription: Self.description,
-                           severity: configuration.severity,
-                           location: Location(file: file, byteOffset: ByteCount(position)))
-        }
+    public func makeVisitor(file: SwiftLintFile) -> ViolationsSyntaxVisitor? {
+        ForceCastRuleVisitor()
     }
 }
 
-private final class ForceCastRuleVisitor: SyntaxVisitor {
-    var positions: [AbsolutePosition] = []
+private final class ForceCastRuleVisitor: SyntaxVisitor, ViolationsSyntaxVisitor {
+    private(set) var violationPositions: [AbsolutePosition] = []
 
     override func visitPost(_ node: AsExprSyntax) {
         if node.questionOrExclamationMark?.tokenKind == .exclamationMark {
-            positions.append(node.asTok.positionAfterSkippingLeadingTrivia)
+            violationPositions.append(node.asTok.positionAfterSkippingLeadingTrivia)
         }
     }
 }

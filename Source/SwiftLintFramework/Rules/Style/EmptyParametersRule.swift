@@ -1,7 +1,7 @@
 import Foundation
 import SourceKittenFramework
 
-public struct EmptyParametersRule: ConfigurationProviderRule, SubstitutionCorrectableRule, AutomaticTestableRule {
+public struct EmptyParametersRule: ConfigurationProviderRule, SubstitutionCorrectableRule {
     public var configuration = SeverityConfiguration(.warning)
 
     public init() {}
@@ -14,7 +14,7 @@ public struct EmptyParametersRule: ConfigurationProviderRule, SubstitutionCorrec
         nonTriggeringExamples: [
             Example("let abc: () -> Void = {}\n"),
             Example("func foo(completion: () -> Void)\n"),
-            Example("func foo(completion: () thows -> Void)\n"),
+            Example("func foo(completion: () throws -> Void)\n"),
             Example("let foo: (ConfigurationTests) -> Void throws -> Void)\n"),
             Example("let foo: (ConfigurationTests) ->   Void throws -> Void)\n"),
             Example("let foo: (ConfigurationTests) ->Void throws -> Void)\n")

@@ -1,7 +1,7 @@
 import Foundation
 import SourceKittenFramework
 
-public struct UnusedDeclarationRule: AutomaticTestableRule, ConfigurationProviderRule, AnalyzerRule, CollectingRule {
+public struct UnusedDeclarationRule: ConfigurationProviderRule, AnalyzerRule, CollectingRule {
     public struct FileUSRs: Hashable {
         var referenced: Set<String>
         var declared: Set<DeclaredUSR>
@@ -301,7 +301,10 @@ private extension SourceKittenDictionary {
             "buildEither(second:)",
             "buildArray(_:)",
             "buildLimitedAvailability(_:)",
-            "buildFinalResult(_:)"
+            "buildFinalResult(_:)",
+            // https://github.com/apple/swift-evolution/blob/main/proposals/0348-buildpartialblock.md
+            "buildPartialBlock(first:)",
+            "buildPartialBlock(accumulated:next:)"
         ]
 
         return resultBuilderStaticMethods.contains(name)

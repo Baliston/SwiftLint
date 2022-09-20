@@ -1,7 +1,7 @@
 import Foundation
 import SourceKittenFramework
 
-public struct MultilineArgumentsBracketsRule: ASTRule, OptInRule, ConfigurationProviderRule, AutomaticTestableRule {
+public struct MultilineArgumentsBracketsRule: ASTRule, OptInRule, ConfigurationProviderRule {
     public var configuration = SeverityConfiguration(.warning)
 
     public init() {}
@@ -83,6 +83,11 @@ public struct MultilineArgumentsBracketsRule: ASTRule, OptInRule, ConfigurationP
             Example("""
             foo(
                 param1: "Param1",
+                param2: "Param2",
+                param3: "Param3"↓)
+            """),
+            Example("""
+            foo(↓param1: "Param1",
                 param2: "Param2",
                 param3: "Param3"↓)
             """),

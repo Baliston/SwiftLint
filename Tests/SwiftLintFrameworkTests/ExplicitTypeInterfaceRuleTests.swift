@@ -2,10 +2,6 @@ import SwiftLintFramework
 import XCTest
 
 class ExplicitTypeInterfaceRuleTests: XCTestCase {
-    func testExplicitTypeInterface() {
-        verifyRule(ExplicitTypeInterfaceRule.description)
-    }
-
     func testLocalVars() {
         let nonTriggeringExamples = [
             Example("func foo() {\nlet intVal: Int = 1\n}"),
@@ -94,7 +90,7 @@ class ExplicitTypeInterfaceRuleTests: XCTestCase {
         verifyRule(description, ruleConfiguration: ["allow_redundancy": true])
     }
 
-    func testEmbededInStatements() {
+    func testEmbeddedInStatements() {
         let nonTriggeringExamples = [
             Example("""
             func foo() {
